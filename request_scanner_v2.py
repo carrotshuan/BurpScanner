@@ -106,7 +106,7 @@ def send_request():
 
 		conn.close()
 
-def extract_variable():
+def modify_variable_one_by_one():
 	req_1 = all_analized_data[0]
 	print req_1
 
@@ -116,14 +116,38 @@ def extract_variable():
 
 	else:
 		print 'post method'
+		attack_command = "`touch /tmp/bss`"
 
 		data = req_1["data"]
-		print "data is:",data,"\n"
+		print "Initial data is:\n",data,"\n"
 
 		args = data.split("&")
-		for i in args:
-			print i,"\n"
+		count = len(args)
 
+		for i in range(count):
+
+			current_arg = args[i]
+			equal_num_position = current_arg.find("=")
+
+			modified_arg = current_arg[0:equal_num_position+1] + attack_command
+			print "Modified data: " + modified_arg
+
+			backup_arg_data = current_arg
+
+			args[i] = modified_arg
+			modified_total_data = "&".join(args)
+			args[i] = backup_arg_data
+
+			print "Modified total test arg:\n",modified_total_data,"\n"
+
+
+			# for j in range(count):
+
+			# 	if i == j:
+			# 		modified_total_data += modified_arg
+			# 	else:
+			# 		modified_total_data += args[j]
+			# print "Modified test data: ", modified_total_data,"\n"
 
 
 
@@ -135,7 +159,7 @@ def main():
 		# print i, "\n"
 	# print all_analized_data
 	# send_request()
-	extract_variable()
+	modify_variable_one_by_one()
 
 
 
