@@ -1,6 +1,9 @@
 # coding=utf-8
 import urllib, urllib2, json
 import time
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 # 全局变量，保存分析后的request每项数据
 all_analized_data = []
@@ -67,13 +70,15 @@ def analize_data():
 
 def send_request():
 	
-	first_request = all_analized_data[2]
+	first_request = all_analized_data[1]
 	# print "request to send:",first_request
 
 	Host = first_request["headers"]["Host"]
 	url = "http://" + Host + first_request["first_line"][1]
 	headers = first_request["headers"]
 	data = first_request["data"]
+
+	print sys.getdefaultencoding()
 
 	print "URL: " + url + "\n"
 	print "Headers: ", headers , "\n"
@@ -84,20 +89,43 @@ def send_request():
 		req = urllib2.Request(url, data, headers)
 		# print req
 		response = urllib2.urlopen(req)
-		html = response.read()
+		html = response.readlines()
 
 		print "GET Response: " + html
 
 	else:
+		data="abc"
+
 		data_urlencoding = urllib.urlencode(data)
 		conn = httplib.HTTPConnection(Host)
 
 		conn.request(method="POST",url=url,body=data_urlencoding,headers = headers) 
 		response = conn.getresponse()
-		res= response.read()
+		res= response.readlines()
 		print "POST Response: " + res
 
 		conn.close()
+
+def extract_variable():
+	req_1 = all_analized_data[0]
+	print req_1
+
+	if req_1["first_line"][0] == "GET":
+		print 'get method'
+
+
+	else:
+		print 'post method'
+
+		data = req_1["data"]
+		print "data is:",data,"\n"
+
+		args = data.split("&")
+		for i in args:
+			print i,"\n"
+
+
+
 
 def main():
 
@@ -106,7 +134,8 @@ def main():
 	# for i in all_analized_data:
 		# print i, "\n"
 	# print all_analized_data
-	send_request()
+	# send_request()
+	extract_variable()
 
 
 
